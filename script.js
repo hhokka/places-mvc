@@ -5,27 +5,33 @@
  */
 class Model {
   constructor() {
+    //Convert this to CRUD
     this.todos = JSON.parse(localStorage.getItem('todos')) || []
   }
 
   bindTodoListChanged(callback) {
     this.onTodoListChanged = callback
+    console.log("changed");
   }
 
   _commit(todos) {
     this.onTodoListChanged(todos)
     localStorage.setItem('todos', JSON.stringify(todos))
+    console.log("setItem");
   }
 
-  addTodo(todoText) {
+  addTodo(todoText, todoDescription, todoOpeningHours, todoLatitude, todoLongitude) {
     const todo = {
       id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
       text: todoText,
+      description: todoDescription,
+      openingHours: todoOpeningHours,
+      latitude: todoLatitude,
+      longitude: todoLongitude,
       complete: false,
     }
-
+    alert(todo)
     this.todos.push(todo)
-
     this._commit(this.todos)
   }
 
@@ -35,12 +41,14 @@ class Model {
     )
 
     this._commit(this.todos)
+    console.log("edit_commit " + this.todos);
   }
 
   deleteTodo(id) {
     this.todos = this.todos.filter(todo => todo.id !== id)
 
     this._commit(this.todos)
+    console.log("edit_commit " + this.todos);
   }
 
   toggleTodo(id) {
@@ -49,6 +57,7 @@ class Model {
     )
 
     this._commit(this.todos)
+    console.log("toggle_commit " + this.todos);
   }
 }
 
@@ -61,28 +70,59 @@ class View {
   constructor() {
     this.app = this.getElement('#root')
     this.form = this.createElement('form')
-    this.input = this.createElement('input')
-    this.input.type = 'text'
-    this.input.placeholder = 'Add todo'
-    this.input.name = 'todo'
+    
+    this.inputName = this.createElement('input')
+    this.inputName.type = 'text'
+    this.inputName.placeholder = 'Add Name'
+    this.inputName.name = 'name'
+    
+    this.inputDescription = this.createElement('input')
+    this.inputDescription.type = 'text'
+    this.inputDescription.placeholder = 'Description'
+    this.inputDescription.name = 'description'
+    
+    this.inputOpeningHours = this.createElement('input')
+    this.inputOpeningHours.type = 'text'
+    this.inputOpeningHours.placeholder = 'Opening Hours'
+    this.inputOpeningHours.name = 'openingHours'
+    
+    this.inputLatitude = this.createElement('input')
+    this.inputLatitude.type = 'text'
+    this.inputLatitude.placeholder = 'Latitude'
+    this.inputLatitude.name = 'latitude'
+    
+    this.inputLongitude = this.createElement('input')
+    this.inputLongitude.type = 'text'
+    this.inputLongitude.placeholder = 'Longitude'
+    this.inputLongitude.name = 'longitude'
+    
     this.submitButton = this.createElement('button')
     this.submitButton.textContent = 'Submit'
-    this.form.append(this.input, this.submitButton)
+    this.form.append(this.inputName, this.inputDescription, this.inputOpeningHours, this.inputLatitude, this.inputLongitude, this.submitButton)
     this.title = this.createElement('h1')
-    this.title.textContent = 'Todos'
+    this.title.textContent = 'Places'
     this.todoList = this.createElement('ul', 'todo-list')
     this.app.append(this.title, this.form, this.todoList)
-
     this._temporaryTodoText = ''
     this._initLocalListeners()
   }
 
   get _todoText() {
-    return this.input.value
+    return this.inputName.value
+  }
+  get _todoDescription() {
+    return this.inputDescription.value
+  }
+  get _todoOpeningHours() {
+    return this.inputOpeningHours.value
   }
 
   _resetInput() {
-    this.input.value = ''
+    this.inputName.value = ''
+    this.inputDescription.value = ''
+    this.inputOpeningHours.value = ''
+    this.inputLatitude.value = ''
+    this.inputLongitude.value = ''
   }
 
   createElement(tag, className) {
@@ -120,21 +160,34 @@ class View {
         checkbox.type = 'checkbox'
         checkbox.checked = todo.complete
 
-        const span = this.createElement('span')
-        span.contentEditable = true
-        span.classList.add('editable')
+        const spanName = this.createElement('span', 'name')
+        
+        const spanDescription = this.createElement('span', 'description')
+        
+        const spanOpeningHours = this.createElement('span', 'openingHours')
+        
+        const spanLatitude = this.createElement('span', 'latitude')
+        
+        const spanLongitude = this.createElement('span', 'longitude')
+        
+        console.log(todo.id);
 
-        if (todo.complete) {
+      /* if (todo.complete) {
           const strike = this.createElement('s')
           strike.textContent = todo.text
           span.append(strike)
         } else {
           span.textContent = todo.text
-        }
+        } */
+        spanName.textContent = todo.text
+        spanDescription.textContent = todo.description
+        spanOpeningHours.textContent = todo.OpeningHours
+        spanLatitude.textContent = todo.latitude
+        spanLongitude.textContent = todo.inputLongitude
 
         const deleteButton = this.createElement('button', 'delete')
         deleteButton.textContent = 'Delete'
-        li.append(checkbox, span, deleteButton)
+        li.append(checkbox, spanName, spanDescription, spanOpeningHours, spanLatitude, spanLongitude, deleteButton)
 
         // Append nodes
         this.todoList.append(li)
@@ -156,10 +209,11 @@ class View {
   bindAddTodo(handler) {
     this.form.addEventListener('submit', event => {
       event.preventDefault()
-
-      if (this._todoText) {
-        handler(this._todoText)
+      if (this._todoText || this._todoDescription) {
+        alert("handler: " + handler);
+        handler(this._todoText, this._todoDescription)
         this._resetInput()
+        
       }
     })
   }
@@ -224,8 +278,8 @@ class Controller {
     this.view.displayTodos(todos)
   }
 
-  handleAddTodo = todoText => {
-    this.model.addTodo(todoText)
+  handleAddTodo = (todoText,todoDescription) => {
+    this.model.addTodo(todoText, todoDescription)
   }
 
   handleEditTodo = (id, todoText) => {

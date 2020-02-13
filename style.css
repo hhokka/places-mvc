@@ -11,7 +11,7 @@ html {
 }
 
 #root {
-  max-width: 450px;
+  max-width: 640px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
@@ -87,4 +87,34 @@ li span:focus {
   outline: 0;
   border: 2px solid #007bff;
   background: rgba(179, 207, 255, 0.52)
+}
+
+.name {
+  border: 2px solid red;
+  height: 50px;
+  width: 50px;
+}
+
+.description {
+  border: 2px solid blue;
+  height: 50px;
+  width: 50px;
+}
+
+.openingHours {
+  border: 2px solid yellow;
+  height: 50px;
+  width: 50px;
+}
+
+.latitude {
+  border: 2px solid violet;
+  height: 50px;
+  width: 50px;
+}
+
+.longitude {
+  border: 2px solid tomato;
+  height: 50px;
+  width: 50px;
 }
