@@ -30,7 +30,6 @@ class Model {
       longitude: todoLongitude,
       complete: false,
     }
-    alert(todo)
     this.todos.push(todo)
     this._commit(this.todos)
   }
@@ -116,6 +115,14 @@ class View {
   get _todoOpeningHours() {
     return this.inputOpeningHours.value
   }
+  get _todoLatitude() {
+    return this.inputLatitude.value
+  }
+  get _todoLongitude() {
+    return this.inputLongitude.value
+  }
+  
+  
 
   _resetInput() {
     this.inputName.value = ''
@@ -161,33 +168,43 @@ class View {
         checkbox.checked = todo.complete
 
         const spanName = this.createElement('span', 'name')
+        spanName.contentEditable = true
+        spanName.classList.add('editable')
         
         const spanDescription = this.createElement('span', 'description')
+        spanDescription.contentEditable = true
+        spanDescription.classList.add('editable')
         
         const spanOpeningHours = this.createElement('span', 'openingHours')
+        spanOpeningHours.contentEditable = true
+        spanOpeningHours.classList.add('editable')
         
         const spanLatitude = this.createElement('span', 'latitude')
+        spanLatitude.contentEditable = true
+        spanLatitude.classList.add('editable')
         
         const spanLongitude = this.createElement('span', 'longitude')
+        spanLongitude.contentEditable = true
+        spanLongitude.classList.add('editable')
         
         console.log(todo.id);
 
       /* if (todo.complete) {
           const strike = this.createElement('s')
           strike.textContent = todo.text
-          span.append(strike)
+          spanName.append(strike)
         } else {
-          span.textContent = todo.text
+          spanName.textContent = todo.text
         } */
         spanName.textContent = todo.text
         spanDescription.textContent = todo.description
-        spanOpeningHours.textContent = todo.OpeningHours
+        spanOpeningHours.textContent = todo.openingHours
         spanLatitude.textContent = todo.latitude
-        spanLongitude.textContent = todo.inputLongitude
+        spanLongitude.textContent = todo.longitude
 
         const deleteButton = this.createElement('button', 'delete')
         deleteButton.textContent = 'Delete'
-        li.append(checkbox, spanName, spanDescription, spanOpeningHours, spanLatitude, spanLongitude, deleteButton)
+        li.append(/* checkbox,  */spanName, spanDescription, spanOpeningHours, spanLatitude, spanLongitude, deleteButton)
 
         // Append nodes
         this.todoList.append(li)
@@ -209,9 +226,9 @@ class View {
   bindAddTodo(handler) {
     this.form.addEventListener('submit', event => {
       event.preventDefault()
-      if (this._todoText || this._todoDescription) {
+      if (this._todoText || this._todoDescription || this._todoOpeningHours || this._todoLatitude || this._todoLongitude) {
         alert("handler: " + handler);
-        handler(this._todoText, this._todoDescription)
+        handler(this._todoText, this._todoDescription, this._todoOpeningHours, this._todoLatitude, this._todoLongitude)
         this._resetInput()
         
       }
@@ -278,8 +295,8 @@ class Controller {
     this.view.displayTodos(todos)
   }
 
-  handleAddTodo = (todoText,todoDescription) => {
-    this.model.addTodo(todoText, todoDescription)
+  handleAddTodo = (todoText,todoDescription, todoOpeningHours, todoLatitude, todoLongitude) => {
+    this.model.addTodo(todoText, todoDescription, todoOpeningHours, todoLatitude, todoLongitude)
   }
 
   handleEditTodo = (id, todoText) => {
