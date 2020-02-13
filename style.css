@@ -118,3 +118,7 @@ li span:focus {
   height: 50px;
   width: 50px;
 }
+
+#inputForm {
+  border: 5px solid red;
+}

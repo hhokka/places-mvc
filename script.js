@@ -21,6 +21,7 @@ class Model {
   }
 
   addTodo(todoText, todoDescription, todoOpeningHours, todoLatitude, todoLongitude) {
+    alert("add")
     const todo = {
       id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
       text: todoText,
@@ -32,6 +33,10 @@ class Model {
     }
     this.todos.push(todo)
     this._commit(this.todos)
+  }
+
+  searchTodo(todoText){
+    alert("searchTodo:" + todoText)
   }
 
   editTodo(id, updatedText) {
@@ -68,7 +73,7 @@ class Model {
 class View {
   constructor() {
     this.app = this.getElement('#root')
-    this.form = this.createElement('form')
+    this.inputForm = this.createElement('form')
     
     this.inputName = this.createElement('input')
     this.inputName.type = 'text'
@@ -97,13 +102,24 @@ class View {
     
     this.submitButton = this.createElement('button')
     this.submitButton.textContent = 'Submit'
-    this.form.append(this.inputName, this.inputDescription, this.inputOpeningHours, this.inputLatitude, this.inputLongitude, this.submitButton)
+    this.inputForm.append(this.inputName, this.inputDescription, this.inputOpeningHours, this.inputLatitude, this.inputLongitude, this.submitButton)
     this.title = this.createElement('h1')
     this.title.textContent = 'Places'
     this.todoList = this.createElement('ul', 'todo-list')
-    this.app.append(this.title, this.form, this.todoList)
+    this.app.append(this.title, this.inputForm, this.todoList)
     this._temporaryTodoText = ''
     this._initLocalListeners()
+    
+    this.searchForm = this.createElement('form')
+    
+    this.searchName = this.createElement('input')
+    this.searchName.type = 'text'
+    this.searchName.placeholder = 'Search'
+    this.searchName.name = 'search'
+    this.searchButton = this.createElement('button')
+    this.searchButton.textContent = 'Submit'
+    this.searchForm.append(this.searchName, this.searchButton) 
+    this.app.append(this.searchForm)
   }
 
   get _todoText() {
@@ -120,6 +136,9 @@ class View {
   }
   get _todoLongitude() {
     return this.inputLongitude.value
+  }
+  get _searchName() {
+    return this.searchName.value
   }
   
   
@@ -224,7 +243,7 @@ class View {
   }
 
   bindAddTodo(handler) {
-    this.form.addEventListener('submit', event => {
+    this.inputForm.addEventListener('submit', event => {
       event.preventDefault()
       if (this._todoText || this._todoDescription || this._todoOpeningHours || this._todoLatitude || this._todoLongitude) {
         alert("handler: " + handler);
@@ -232,6 +251,16 @@ class View {
         this._resetInput()
         
       }
+    })
+  }
+
+  bindSearchTodo(handler) {
+    this.searchForm.addEventListener('submit', event => {
+      event.preventDefault()
+      alert("bind search todo handler: " + handler);
+      alert("bind search todo text: " + this._searchName);
+      handler(this._searchName)
+      //  handler(this._todoText, this._todoDescription, this._todoOpeningHours, this._todoLatitude, this._todoLongitude)
     })
   }
 
@@ -283,6 +312,7 @@ class Controller {
     // Explicit this binding
     this.model.bindTodoListChanged(this.onTodoListChanged)
     this.view.bindAddTodo(this.handleAddTodo)
+    this.view.bindSearchTodo(this.handleSearchTodo)
     this.view.bindEditTodo(this.handleEditTodo)
     this.view.bindDeleteTodo(this.handleDeleteTodo)
     this.view.bindToggleTodo(this.handleToggleTodo)
@@ -297,6 +327,10 @@ class Controller {
 
   handleAddTodo = (todoText,todoDescription, todoOpeningHours, todoLatitude, todoLongitude) => {
     this.model.addTodo(todoText, todoDescription, todoOpeningHours, todoLatitude, todoLongitude)
+  }
+
+  handleSearchTodo = (todoText) => {
+    this.model.searchTodo(todoText)
   }
 
   handleEditTodo = (id, todoText) => {
